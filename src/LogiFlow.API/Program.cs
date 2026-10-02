@@ -8,15 +8,26 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Application and Infrastructure
+// --------------------------------------------------
+// APPLICATION & INFRASTRUCTURE
+// --------------------------------------------------
+
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// Controllers
+
+// --------------------------------------------------
+// CONTROLLERS
+// --------------------------------------------------
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Swagger
+
+// --------------------------------------------------
+// SWAGGER
+// --------------------------------------------------
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -52,7 +63,11 @@ builder.Services.AddSwaggerGen(options =>
         });
 });
 
-// JWT configuration
+
+// --------------------------------------------------
+// JWT CONFIGURATION
+// --------------------------------------------------
+
 var jwtKey = builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException(
         "Jwt:Key is missing from configuration.");
@@ -86,21 +101,30 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
+
+// --------------------------------------------------
 // CORS
+// --------------------------------------------------
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Angular", policy =>
     {
         policy
+            .AllowAnyOrigin()
             .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowAnyOrigin();
+            .AllowAnyMethod();
     });
 });
 
+
 var app = builder.Build();
 
-// Database seeding
+
+// --------------------------------------------------
+// DATABASE SEEDING
+// --------------------------------------------------
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider
@@ -121,15 +145,28 @@ using (var scope = app.Services.CreateScope())
             ?? "Admin@12345");
 }
 
-// Exception handling
+
+// --------------------------------------------------
+// EXCEPTION HANDLING
+// --------------------------------------------------
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Swagger
+
+// --------------------------------------------------
+// SWAGGER
+// --------------------------------------------------
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
+// --------------------------------------------------
+// MIDDLEWARE
+// --------------------------------------------------
 
 app.UseHttpsRedirection();
 
